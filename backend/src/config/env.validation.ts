@@ -20,4 +20,8 @@ export const envValidationSchema = Joi.object({
   REDIS_PORT: Joi.number().port().default(6379),
   REDIS_PASSWORD: Joi.string().allow('').optional(),
   REDIS_DB: Joi.number().min(0).default(0),
+
+  // 짧은 비밀키는 브루트포스에 취약하므로 최소 길이를 강제한다.
+  JWT_SECRET: Joi.string().min(32).required(),
+  JWT_EXPIRES_IN: Joi.string().default('1h'),
 });
