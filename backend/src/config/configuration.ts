@@ -20,10 +20,16 @@ export interface RedisConfig {
   db: number;
 }
 
+export interface JwtConfig {
+  secret: string;
+  expiresIn: string;
+}
+
 export interface Configuration {
   app: AppConfig;
   database: DatabaseConfig;
   redis: RedisConfig;
+  jwt: JwtConfig;
 }
 
 export default (): Configuration => {
@@ -50,6 +56,11 @@ export default (): Configuration => {
       port: Number(process.env.REDIS_PORT ?? 6379),
       password: process.env.REDIS_PASSWORD || undefined,
       db: Number(process.env.REDIS_DB ?? 0),
+    },
+    jwt: {
+      // 검증 스키마에서 required이므로 여기까지 왔다면 값이 존재한다.
+      secret: process.env.JWT_SECRET as string,
+      expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
     },
   };
 };

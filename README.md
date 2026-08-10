@@ -126,7 +126,7 @@ DB나 Redis가 끊기면 해당 항목이 `down`으로 바뀌고 HTTP 503을 반
 - [x] React frontend 프로젝트 생성
 - [x] Docker Compose (PostgreSQL + Redis) 구성
 - [x] Backend DB / Redis 연결 설정 및 헬스체크 API
-- [ ] 회원가입 / 로그인 (JWT)
+- [x] 회원가입 / 로그인 (JWT), 인증·권한 가드
 - [ ] 상품 목록 / 상세 / 관리자 상품 등록
 - [ ] 오픈런 이벤트 등록
 - [ ] Redis 대기열 진입 및 순번 조회
