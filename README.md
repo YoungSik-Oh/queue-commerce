@@ -32,7 +32,7 @@ DB 커넥션과 재고 정합성이 동시에 무너진다.
 
 | 영역 | 스택 |
 | --- | --- |
-| Backend | NestJS, TypeScript, TypeORM, REST API, JWT |
+| Backend | NestJS, TypeScript, TypeORM, ioredis, REST API, JWT |
 | Database | PostgreSQL |
 | Cache / Queue | Redis (Sorted Set, String TTL, Hash) |
 | Frontend | React, TypeScript, Vite, React Router |
@@ -65,24 +65,49 @@ queue-commerce/
 
 ## 실행 방법
 
-> Docker Compose 기반 통합 실행 환경은 다음 단계에서 추가된다.
-> 현재는 각 프로젝트를 개별 실행한다.
+### 1. 인프라 (PostgreSQL + Redis)
 
-### Backend
+```bash
+cd infra/docker-compose
+cp .env.example .env
+docker compose up -d
+docker compose ps          # 두 컨테이너가 healthy 인지 확인
+```
+
+### 2. Backend
 
 ```bash
 cd backend
+cp .env.example .env       # DB/Redis 접속 정보는 infra/docker-compose/.env 와 맞춘다
 npm install
-npm run start:dev      # http://localhost:3000
+npm run start:dev          # http://localhost:3000
 ```
 
-### Frontend
+### 3. Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev            # http://localhost:5173
+npm run dev                # http://localhost:5173
 ```
+
+### 연결 확인
+
+```bash
+curl http://localhost:3000/health
+```
+
+```json
+{
+  "status": "ok",
+  "info": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  }
+}
+```
+
+DB나 Redis가 끊기면 해당 항목이 `down`으로 바뀌고 HTTP 503을 반환한다.
 
 ## 문서
 
@@ -99,8 +124,8 @@ npm run dev            # http://localhost:5173
 - [x] Monorepo 초기 폴더 구조 생성
 - [x] NestJS backend 프로젝트 생성
 - [x] React frontend 프로젝트 생성
-- [ ] Docker Compose (PostgreSQL + Redis) 구성
-- [ ] Backend DB / Redis 연결 설정
+- [x] Docker Compose (PostgreSQL + Redis) 구성
+- [x] Backend DB / Redis 연결 설정 및 헬스체크 API
 - [ ] 회원가입 / 로그인 (JWT)
 - [ ] 상품 목록 / 상세 / 관리자 상품 등록
 - [ ] 오픈런 이벤트 등록

@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
+export interface ServiceInfo {
+  service: string;
+  status: 'running';
+}
+
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getServiceInfo(): ServiceInfo {
+    return { service: 'queue-commerce-api', status: 'running' };
   }
 }

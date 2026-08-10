@@ -15,8 +15,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('서비스 정보를 반환한다', () => {
+      expect(appController.getServiceInfo()).toEqual({
+        service: 'queue-commerce-api',
+        status: 'running',
+      });
     });
   });
 });

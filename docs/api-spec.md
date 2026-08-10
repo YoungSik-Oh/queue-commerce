@@ -3,6 +3,39 @@
 > 구현이 진행되면서 갱신한다. 최종적으로는 Swagger로 정리한다.
 > Base URL: `http://localhost:3000`
 
+## 시스템
+
+| Method | Path | 설명 | 인증 |
+| --- | --- | --- | --- |
+| GET | `/` | 서비스 정보 | - |
+| GET | `/health` | DB / Redis 연결 상태 | - |
+
+### GET `/health`
+
+정상일 때 200:
+
+```json
+{
+  "status": "ok",
+  "info": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  }
+}
+```
+
+하나라도 끊기면 503:
+
+```json
+{
+  "status": "error",
+  "info": {
+    "database": { "status": "up" },
+    "redis": { "status": "down", "message": "ECONNREFUSED" }
+  }
+}
+```
+
 ## 인증
 
 | Method | Path | 설명 | 인증 |
