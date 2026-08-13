@@ -117,9 +117,76 @@ Authorization: Bearer <accessToken>
 | --- | --- | --- | --- |
 | GET | `/products` | 상품 목록 조회 | - |
 | GET | `/products/:id` | 상품 상세 조회 | - |
+| GET | `/admin/products` | 상품 목록 조회 (HIDDEN 포함) | ADMIN |
+| GET | `/admin/products/:id` | 상품 상세 조회 (HIDDEN 포함) | ADMIN |
 | POST | `/admin/products` | 상품 등록 | ADMIN |
 | PATCH | `/admin/products/:id` | 상품 수정 | ADMIN |
 | DELETE | `/admin/products/:id` | 상품 삭제 | ADMIN |
+
+### 상품 상태
+
+| status | 의미 | 공개 조회 노출 |
+| --- | --- | --- |
+| `ON_SALE` | 판매 중 | O |
+| `SOLD_OUT` | 품절. 노출하되 주문은 막는다 | O |
+| `HIDDEN` | 비공개. 오픈런 시작 전 미리 등록해 둔 상품 | X |
+
+공개 엔드포인트는 `HIDDEN` 상품을 목록에서 제외하고, 상세로 직접 요청하면 404를 반환한다.
+403을 주면 그 id에 상품이 있다는 사실이 드러나므로 없는 것과 똑같이 응답한다.
+`GET /products?status=HIDDEN` 으로 우회 조회해도 결과는 비어 있다.
+
+### GET `/products`
+
+쿼리 파라미터는 모두 선택이다.
+
+| 파라미터 | 기본값 | 설명 |
+| --- | --- | --- |
+| `page` | 1 | 1 이상 |
+| `limit` | 20 | 1~100. 초과하면 400 |
+| `status` | - | `ON_SALE` 또는 `SOLD_OUT` |
+
+200 응답.
+
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "한정판 스니커즈",
+      "description": "설명입니다",
+      "price": 179000,
+      "stock": 10,
+      "status": "ON_SALE",
+      "createdAt": "2026-08-14T00:00:00.000Z",
+      "updatedAt": "2026-08-14T00:00:00.000Z"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 20
+}
+```
+
+`price`는 원 단위 정수다. `decimal`을 쓰면 TypeORM이 문자열로 돌려주고, 원화는 소수점을 쓰지 않는다.
+
+### POST `/admin/products`
+
+```json
+{ "name": "한정판 스니커즈", "description": "설명입니다", "price": 199000, "stock": 10 }
+```
+
+`status`를 생략하면 `HIDDEN`으로 등록된다. 오픈런은 미리 만들어 두고 나중에 여는 흐름이기 때문이다.
+`description`은 선택이며 생략하면 `null`이다.
+
+### PATCH `/admin/products/:id`
+
+보낸 필드만 수정한다. 없는 상품이면 404를 반환한다.
+
+### DELETE `/admin/products/:id`
+
+204를 반환하며 본문이 없다. 행을 지우지 않고 `deletedAt`을 채우는 soft delete다.
+하드 삭제하면 이 상품을 참조하는 주문 이력이 깨진다.
+삭제된 상품은 관리자 조회에서도 404다.
 
 ## 오픈런 이벤트
 
